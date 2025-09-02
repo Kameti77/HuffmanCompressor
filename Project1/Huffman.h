@@ -1,8 +1,8 @@
 #ifndef HUFFMANCOMPRESSOR_H
 #define HUFFMANCOMPRESSOR_H
 
-#include "ICompressor.h"
-#include "HuffmanTree.h"
+#include "../include/ICompressor.h"
+#include "../include/HuffmanTree.h"
 #include <unordered_map>
 #include <string>
 #include <map> 
@@ -16,10 +16,9 @@ public:
     void decompress(const std::string& inputFile, const std::string& outputFile) override;
 
     std::map<unsigned char, int> getFrequencyTable() const;
-    void buildFrequencyTable(const std::string& inputFile);
-
 private:
-    std::map<unsigned char, int> frequencyTable;
+    void buildFrequencyTable(const std::string& inputFile);
 };
 
 #endif
+

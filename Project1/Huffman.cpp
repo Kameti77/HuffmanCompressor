@@ -1,6 +1,4 @@
-#include "../include/HuffmanCompressor.h"
-//#include "BitWriter.h"
-//#include "BitReader.h"
+#include "Huffman.h"
 #include <fstream>
 #include <iostream>
 
