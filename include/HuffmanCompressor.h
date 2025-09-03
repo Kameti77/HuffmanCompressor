@@ -50,11 +50,19 @@ public:
     HuffNode* GenerateTree(const std::array<size_t, 256>& frequencies);
     void FreeTree(HuffNode* root);
 
+    void GenerateCodes(HuffNode* root);
+
+    // For testing
+    void printFirstCodes(int n = 10);
+
 private:
     std::map<unsigned char, int> mFrequencyTable;
 
     std::vector<HuffNode*> mLeafList;
     HuffNode* mRoot = reinterpret_cast<HuffNode*>(-1);
+    std::map<unsigned char, std::string> mCodes;
+
+    void GenerateCodesRecursive(HuffNode* node, const std::string& prefix);
 };
 
 #endif

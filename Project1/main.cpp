@@ -25,6 +25,7 @@ int main() {
 
     std::cout << "\n================\n" << std::endl;
     std::ifstream in("../src/test.bin", std::ios::binary);
+
     if (!in) {
         std::cerr << "Cannot open file\n";
         return 1;
@@ -40,6 +41,7 @@ int main() {
 
    
     HuffNode* root = compressor.GenerateTree(freq);
+    compressor.GenerateCodes(root);
 
     if (root) {
         std::cout << "Root frequency = " << root->freq
@@ -49,5 +51,11 @@ int main() {
     else {
         std::cout << "File empty, no tree built.\n";
     }
+
+    std::cout << "\n================\n" << std::endl;
+    compressor.printFirstCodes(10);
+
+
     return 0;
+
 }

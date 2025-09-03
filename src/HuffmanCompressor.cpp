@@ -72,3 +72,29 @@ void HuffmanCompressor::FreeTree(HuffNode* root) {
     FreeTree(root->right);
     delete root;
 }
+
+// Recursive code generation
+void HuffmanCompressor::GenerateCodesRecursive(HuffNode* node, const std::string& prefix) {
+    if (!node) return;
+
+    if (!node->left && !node->right) {
+        mCodes[node->value] = prefix;
+        return;
+    }
+
+    GenerateCodesRecursive(node->left, prefix + "0");
+    GenerateCodesRecursive(node->right, prefix + "1");
+}
+
+void HuffmanCompressor::GenerateCodes(HuffNode* root) {
+    mCodes.clear();
+    GenerateCodesRecursive(root, "");
+}
+
+void HuffmanCompressor::printFirstCodes(int n) {
+    int count = 0;
+    for (auto& pair : mCodes) {
+        std::cout << (int)pair.first << " : " << pair.second << std::endl;
+        if (++count >= n) break;
+    }
+}
