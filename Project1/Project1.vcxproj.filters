@@ -38,6 +38,9 @@
     <None Include="..\src\day1.bin">
       <Filter>Source Files</Filter>
     </None>
+    <None Include="..\src\test.bin">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\BitReader.h">

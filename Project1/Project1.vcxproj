@@ -138,6 +138,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\day1.bin" />
+    <None Include="..\src\test.bin" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\BitReader.h" />
