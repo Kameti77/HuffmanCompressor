@@ -5,7 +5,8 @@
 #include "HuffmanTree.h"
 #include <unordered_map>
 #include <string>
-#include <map> 
+#include <map>
+#include <array>
 
 // Node struct for Huffman tree
 struct HuffNode {
@@ -42,7 +43,7 @@ public:
     void compress(const std::string& inputFile, const std::string& outputFile) override;
     void decompress(const std::string& inputFile, const std::string& outputFile) override;
 
-    std::map<unsigned char, int> getFrequencyTable() const;
+    std::array<size_t, 256> getFrequencyTable() const;
     void buildFrequencyTable(const std::string& inputFile);
 
 
@@ -53,10 +54,15 @@ public:
     void GenerateCodes(HuffNode* root);
 
     // For testing
-    void printFirstCodes(int n = 10);
+    void PrintFirstCodes(int n = 10);
+
+    // Append the codes to a growing string of '0' and '1'.
+    std::string encodeFile(const std::string& filename);
 
 private:
-    std::map<unsigned char, int> mFrequencyTable;
+    //std::map<unsigned char, int> 
+    // std::array<std::size_t, 256> mFrequencyTable{};
+    std::array<std::size_t, 256> mFrequencyTable{};
 
     std::vector<HuffNode*> mLeafList;
     HuffNode* mRoot = reinterpret_cast<HuffNode*>(-1);

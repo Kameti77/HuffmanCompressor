@@ -8,7 +8,9 @@
 
 using namespace std;
 void HuffmanCompressor::buildFrequencyTable(const std::string& inputFile) {
-    mFrequencyTable.clear();
+   // mFrequencyTable.clear();
+    // mFrequencyTable.fill(0);
+
     // read file and count characters
     std::ifstream in(inputFile, std::ios::binary);
     if (!in) {
@@ -24,7 +26,7 @@ void HuffmanCompressor::buildFrequencyTable(const std::string& inputFile) {
     in.close();
 }
 
-std::map<unsigned char, int> HuffmanCompressor::getFrequencyTable() const {
+std::array<size_t, 256> HuffmanCompressor::getFrequencyTable() const {
     return mFrequencyTable;
 }
 
@@ -91,10 +93,31 @@ void HuffmanCompressor::GenerateCodes(HuffNode* root) {
     GenerateCodesRecursive(root, "");
 }
 
-void HuffmanCompressor::printFirstCodes(int n) {
+void HuffmanCompressor::PrintFirstCodes(int n) {
     int count = 0;
     for (auto& pair : mCodes) {
         std::cout << (int)pair.first << " : " << pair.second << std::endl;
         if (++count >= n) break;
     }
+}
+
+std::string HuffmanCompressor::encodeFile(const std::string& filename) {
+    std::ifstream in(filename, std::ios::binary);
+    if (!in) {
+        std::cerr << "Error: cannot open file " << filename << std::endl;
+        return "";
+    }
+
+    std::string encodedBits;
+    unsigned char byte;
+
+    while (in.read(reinterpret_cast<char*>(&byte), 1)) {
+        encodedBits += mCodes[byte];  // append Huffman code for each byte
+    }
+
+    // Debug: show first 64 bits
+    std::cout << "First 64 bits: "
+        << encodedBits.substr(0, 64) << std::endl;
+
+    return encodedBits;
 }

@@ -5,42 +5,32 @@
 #include <array>
 
 int main() {
+#if 1
     HuffmanCompressor compressor;
     
     std::string filename = "../day1.bin";
+
+    // Day 1: build frequency table
     compressor.buildFrequencyTable(filename);
 
-    std::map<unsigned char, int> freqTable = compressor.getFrequencyTable();
+    auto freqTable = compressor.getFrequencyTable();
 
     int total = 0;
     std::cout << "Frequencies of bytes in " << filename << ":\n";
-    for (auto& pair : freqTable) {
-        std::cout << "Byte 0x" << std::hex << (int)pair.first
-            << " : " << std::dec << pair.second << std::endl;
-        total += pair.second;
+    for (auto& freq : freqTable) {
+        total += freq;
     }
+    
 
     std::cout << "\nTotal bytes counted: " << total << std::endl;
 
 
     std::cout << "\n================\n" << std::endl;
-    std::ifstream in("../src/test.bin", std::ios::binary);
+    // Day 2: build Huffman tree
 
-    if (!in) {
-        std::cerr << "Cannot open file\n";
-        return 1;
-    }
+    HuffNode* root = compressor.GenerateTree(freqTable);
 
-    std::array<size_t, 256> freq = { 0 };
-    unsigned char byte;
-
-    while (in.read(reinterpret_cast<char*>(&byte), 1)) {
-        freq[byte]++;
-        total++;
-    }
-
-   
-    HuffNode* root = compressor.GenerateTree(freq);
+    // Day 3: generate Huffman codes
     compressor.GenerateCodes(root);
 
     if (root) {
@@ -53,9 +43,17 @@ int main() {
     }
 
     std::cout << "\n================\n" << std::endl;
-    compressor.printFirstCodes(10);
 
+
+    // Print first 10 codes
+    compressor.PrintFirstCodes(10);
+
+    std::cout << "\n================\n" << std::endl;
+
+    // Day 4: encode file
+    std::string encodedBits = compressor.encodeFile(filename);
+    std::cout << "Encoded length (bits): " << encodedBits.size() << std::endl;
+#endif
 
     return 0;
-
 }

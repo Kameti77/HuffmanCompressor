@@ -1,17 +1,9 @@
 ﻿C:\Program Files\Microsoft Visual Studio\2022\Enterprise\MSBuild\Microsoft\VC\v170\Microsoft.CppBuild.targets(531,5): warning MSB8028: The intermediate directory (x64\Debug\) contains files shared from another project (Project1.vcxproj).  This can lead to incorrect clean and rebuild behavior.
-  HuffmanCompressor.cpp
-C:\Users\kamet\OneDrive\Desktop\C++\HuffmanCompressor\include\HuffmanCompressor.h(20,16): warning C4244: 'initializing': conversion from 'short' to 'unsigned char', possible loss of data
-  (compiling source file '../src/HuffmanCompressor.cpp')
-  
-C:\Users\kamet\OneDrive\Desktop\C++\HuffmanCompressor\src\HuffmanCompressor.cpp(49,44): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
-C:\Users\kamet\OneDrive\Desktop\C++\HuffmanCompressor\src\HuffmanCompressor.cpp(49,34): warning C4267: 'argument': conversion from 'size_t' to 'short', possible loss of data
-C:\Users\kamet\OneDrive\Desktop\C++\HuffmanCompressor\src\HuffmanCompressor.cpp(58,32): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
   main.cpp
-C:\Users\kamet\OneDrive\Desktop\C++\HuffmanCompressor\include\HuffmanCompressor.h(20,16): warning C4244: 'initializing': conversion from 'short' to 'unsigned char', possible loss of data
+C:\Users\kamet\OneDrive\Desktop\C++\HuffmanCompressor\include\HuffmanCompressor.h(21,16): warning C4244: 'initializing': conversion from 'short' to 'unsigned char', possible loss of data
   (compiling source file 'main.cpp')
   
-  Generating Code...
-  LINK : C:\Users\kamet\OneDrive\Desktop\C++\HuffmanCompressor\x64\Debug\HuffmanCompressor.exe not found or not built by the last incremental link; performing full link
+C:\Users\kamet\OneDrive\Desktop\C++\HuffmanCompressor\Project1\main.cpp(21,18): warning C4267: '+=': conversion from 'size_t' to 'int', possible loss of data
   Project1.vcxproj -> C:\Users\kamet\OneDrive\Desktop\C++\HuffmanCompressor\x64\Debug\HuffmanCompressor.exe
   'pwsh.exe' is not recognized as an internal or external command,
   operable program or batch file.
