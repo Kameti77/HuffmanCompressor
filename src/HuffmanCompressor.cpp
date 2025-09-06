@@ -1,5 +1,5 @@
 #include "../include/HuffmanCompressor.h"
-//#include "BitWriter.h"
+#include "../include/BitWriter.h"
 //#include "BitReader.h"
 #include <fstream>
 #include <iostream>
@@ -30,9 +30,7 @@ std::array<size_t, 256> HuffmanCompressor::getFrequencyTable() const {
     return mFrequencyTable;
 }
 
-void HuffmanCompressor::compress(const std::string& inputFile, const std::string& outputFile) {
-    // TODO: implement Huffman compression using HuffmanTree + BitWriter
-}
+
 
 void HuffmanCompressor::decompress(const std::string& inputFile, const std::string& outputFile) {
     // TODO: implement Huffman decompression using BitReader + HuffmanTree
@@ -120,4 +118,39 @@ std::string HuffmanCompressor::encodeFile(const std::string& filename) {
         << encodedBits.substr(0, 64) << std::endl;
 
     return encodedBits;
+} 
+
+void HuffmanCompressor::compress(const std::string& inputFile, const std::string& outputFile) {
+    // 1. Build frequency table
+    buildFrequencyTable(inputFile);
+    auto freqTable = this->getFrequencyTable();
+
+    // 2. Build tree and codes
+    HuffNode* root = GenerateTree(freqTable);
+    GenerateCodes(root);
+
+    // 3. Open output file
+    std::ofstream out(outputFile, std::ios::binary);
+    if (!out) {
+        std::cerr << "Cannot open output file: " << outputFile << std::endl;
+        return;
+    }
+
+    // 4. Write header (frequency table, 256 ints)
+    for (int i = 0; i < 256; i++) {
+        int freq = freqTable[(unsigned char)i];
+        out.write(reinterpret_cast<const char*>(&freq), sizeof(int));
+    }
+
+    // 5. Encode input file into bitstring
+    std::string bitString = encodeFile(inputFile);
+
+    // 6. Use BitWriter for compressed data
+    BitWriter writer(out);
+    writer.writeBits(bitString);
+    writer.flush();
+
+    std::cout << "Compressed file written: " << outputFile << std::endl;
+
+    FreeTree(root);
 }

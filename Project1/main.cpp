@@ -53,7 +53,16 @@ int main() {
     // Day 4: encode file
     std::string encodedBits = compressor.encodeFile(filename);
     std::cout << "Encoded length (bits): " << encodedBits.size() << std::endl;
-#endif
 
+
+    std::cout << "\n================\n" << std::endl;
+
+    // Day 5: compress 
+    std::string input = "../day1.bin";
+    std::string output = "../compressed.huf";
+
+    compressor.compress(input, output);
+
+#endif
     return 0;
 }
