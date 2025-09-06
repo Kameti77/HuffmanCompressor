@@ -1,6 +1,6 @@
 #include "../include/HuffmanCompressor.h"
 #include "../include/BitWriter.h"
-//#include "BitReader.h"
+#include "../include/BitReader.h"
 #include <fstream>
 #include <iostream>
 #include <queue>
@@ -28,12 +28,6 @@ void HuffmanCompressor::buildFrequencyTable(const std::string& inputFile) {
 
 std::array<size_t, 256> HuffmanCompressor::getFrequencyTable() const {
     return mFrequencyTable;
-}
-
-
-
-void HuffmanCompressor::decompress(const std::string& inputFile, const std::string& outputFile) {
-    // TODO: implement Huffman decompression using BitReader + HuffmanTree
 }
 
 
@@ -154,3 +148,55 @@ void HuffmanCompressor::compress(const std::string& inputFile, const std::string
 
     FreeTree(root);
 }
+
+
+
+void HuffmanCompressor::decompress(const std::string& inputFile, const std::string& outputFile) {
+    std::ifstream in(inputFile, std::ios::binary);
+    if (!in) {
+        std::cerr << "Error opening compressed file: " << inputFile << std::endl;
+        return;
+    }
+
+    // 1. Read frequency table
+    std::array<size_t, 256> freq = { 0 };
+    for (int i = 0; i < 256; i++) {
+        uint32_t f;
+        in.read(reinterpret_cast<char*>(&f), sizeof(f));
+        freq[i] = f;
+    }
+
+    // 2. Rebuild Huffman tree
+    HuffNode* root = GenerateTree(freq);
+    if (!root) {
+        std::cerr << "Error: Empty tree, cannot decompress.\n";
+        return;
+    }
+
+    // 3. Decode bitstream
+    std::ofstream out(outputFile, std::ios::binary);
+    BitReader br(in);
+    HuffNode* node = root;
+
+    size_t totalSymbols = 0;
+    for (auto f : freq) totalSymbols += f; // total bytes in original file
+
+    size_t decodedCount = 0;
+    bool bit;
+
+    while (decodedCount < totalSymbols && br.readBit(bit)) {
+        node = bit ? node->right : node->left;
+
+        if (node->left == nullptr && node->right == nullptr) {
+            unsigned char symbol = node->value;
+            out.write(reinterpret_cast<char*>(&symbol), 1);
+            decodedCount++;
+            node = root; // restart from root
+        }
+    }
+
+    FreeTree(root);
+    out.close();
+    std::cout << "Decompression complete: " << outputFile << std::endl;
+}
+

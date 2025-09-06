@@ -63,6 +63,8 @@ int main() {
 
     compressor.compress(input, output);
 
+    // Day 6: decompress
+    compressor.decompress("../compressed.huf", "../restored.bin");
 #endif
     return 0;
 }
