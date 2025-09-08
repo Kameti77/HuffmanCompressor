@@ -5,9 +5,9 @@
 #include <array>
 
 int main() {
-#if 1
     HuffmanCompressor compressor;
-    
+
+#if 1 
     std::string filename = "../day1.bin";
 
     // Day 1: build frequency table
@@ -65,6 +65,8 @@ int main() {
 
     // Day 6: decompress
     compressor.decompress("../compressed.huf", "../restored.bin");
+
 #endif
+
     return 0;
 }

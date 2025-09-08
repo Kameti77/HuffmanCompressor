@@ -6,10 +6,7 @@
 #include <queue>
 #include <array>
 
-using namespace std;
 void HuffmanCompressor::buildFrequencyTable(const std::string& inputFile) {
-   // mFrequencyTable.clear();
-    // mFrequencyTable.fill(0);
 
     // read file and count characters
     std::ifstream in(inputFile, std::ios::binary);
@@ -39,8 +36,8 @@ HuffNode* HuffmanCompressor::GenerateTree(const std::array<size_t, 256>& freqs) 
     std::vector<size_t> frequencies(freqs.begin(), freqs.end());
 
     for (size_t i = 0; i < frequencies.size(); ++i) {
-        if (freqs[i] > 0) {
-            pq.push(new HuffNode(i, freqs[i]));
+        if (frequencies[i] > 0) {
+            pq.push(new HuffNode(i, frequencies[i]));
         }
     }
 
@@ -114,6 +111,12 @@ std::string HuffmanCompressor::encodeFile(const std::string& filename) {
     return encodedBits;
 } 
 
+std::uintmax_t getFileSize(const std::string& filename) {
+    std::ifstream in(filename, std::ios::binary | std::ios::ate);
+    if (!in) return 0; // file not found or can't open
+    return static_cast<std::uintmax_t>(in.tellg());
+}
+
 void HuffmanCompressor::compress(const std::string& inputFile, const std::string& outputFile) {
     // 1. Build frequency table
     buildFrequencyTable(inputFile);
@@ -147,6 +150,18 @@ void HuffmanCompressor::compress(const std::string& inputFile, const std::string
     std::cout << "Compressed file written: " << outputFile << std::endl;
 
     FreeTree(root);
+
+    // Show compression ratio
+    auto originalSize = getFileSize(inputFile);
+    auto compressedSize = getFileSize(inputFile);
+
+    if (originalSize > 0) {
+        double ratio = (double)compressedSize / (double)originalSize;
+        std::cout << "Compression ratio: " << ratio << std::endl;
+    }else if (originalSize == 0) {
+        std::cerr << "Error: Input file is empty.\n";
+        return;
+    }
 }
 
 

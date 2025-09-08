@@ -3,7 +3,7 @@
 C:\Users\kamet\OneDrive\Desktop\C++\HuffmanCompressor\include\HuffmanCompressor.h(21,16): warning C4244: 'initializing': conversion from 'short' to 'unsigned char', possible loss of data
   (compiling source file 'main.cpp')
   
-C:\Users\kamet\OneDrive\Desktop\C++\HuffmanCompressor\Project1\main.cpp(21,18): warning C4267: '+=': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\kamet\OneDrive\Desktop\C++\HuffmanCompressor\Project1\main.cpp(35,18): warning C4267: '+=': conversion from 'size_t' to 'int', possible loss of data
   Project1.vcxproj -> C:\Users\kamet\OneDrive\Desktop\C++\HuffmanCompressor\x64\Debug\HuffmanCompressor.exe
   'pwsh.exe' is not recognized as an internal or external command,
   operable program or batch file.
