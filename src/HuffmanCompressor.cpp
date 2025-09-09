@@ -1,217 +1,131 @@
 #include "../include/HuffmanCompressor.h"
-#include "../include/BitWriter.h"
-#include "../include/BitReader.h"
 #include <fstream>
 #include <iostream>
-#include <queue>
-#include <array>
+
+HuffmanCompressor::HuffmanCompressor() {
+    frequencyTable.fill(0);
+}
 
 void HuffmanCompressor::buildFrequencyTable(const std::string& inputFile) {
+    frequencyTable.fill(0);
 
-    // read file and count characters
     std::ifstream in(inputFile, std::ios::binary);
     if (!in) {
-        std::cerr << "Error: Cannot open file " << inputFile << std::endl;
+        std::cerr << "Error: Cannot open " << inputFile << "\n";
         return;
     }
 
-    unsigned char ch;
-    while (in.read(reinterpret_cast<char*>(&ch), 1)) {
-        mFrequencyTable[ch]++;
+    unsigned char byte;
+    while (in.read(reinterpret_cast<char*>(&byte), 1)) {
+        frequencyTable[byte]++;
     }
-
-    in.close();
 }
 
 std::array<size_t, 256> HuffmanCompressor::getFrequencyTable() const {
-    return mFrequencyTable;
-}
-
-
-
-HuffNode* HuffmanCompressor::GenerateTree(const std::array<size_t, 256>& freqs) {
-    std::priority_queue<HuffNode*, std::vector<HuffNode*>, CompareNode> pq;
-
-    // Create leaf nodes for all nonzero frequencies
-    std::vector<size_t> frequencies(freqs.begin(), freqs.end());
-
-    for (size_t i = 0; i < frequencies.size(); ++i) {
-        if (frequencies[i] > 0) {
-            pq.push(new HuffNode(i, frequencies[i]));
-        }
-    }
-
-    while (pq.size() > 1) {
-        HuffNode* tempLeft = pq.top();
-        pq.pop();
-        HuffNode* tempRight = pq.top();
-        pq.pop();
-        unsigned int totalFreq = tempLeft->freq + tempRight->freq;
-        HuffNode* newParent = new HuffNode(-1, totalFreq, tempLeft, tempRight);
-        tempLeft->parent = newParent;
-        tempRight->parent = newParent;
-        pq.push(newParent);
-    }
-    mRoot = pq.top(); 
-
-    return mRoot;
-}
-
-void HuffmanCompressor::FreeTree(HuffNode* root) {
-    if (!root) return;
-    FreeTree(root->left);
-    FreeTree(root->right);
-    delete root;
-}
-
-// Recursive code generation
-void HuffmanCompressor::GenerateCodesRecursive(HuffNode* node, const std::string& prefix) {
-    if (!node) return;
-
-    if (!node->left && !node->right) {
-        mCodes[node->value] = prefix;
-        return;
-    }
-
-    GenerateCodesRecursive(node->left, prefix + "0");
-    GenerateCodesRecursive(node->right, prefix + "1");
-}
-
-void HuffmanCompressor::GenerateCodes(HuffNode* root) {
-    mCodes.clear();
-    GenerateCodesRecursive(root, "");
-}
-
-void HuffmanCompressor::PrintFirstCodes(int n) {
-    int count = 0;
-    for (auto& pair : mCodes) {
-        std::cout << (int)pair.first << " : " << pair.second << std::endl;
-        if (++count >= n) break;
-    }
-}
-
-std::string HuffmanCompressor::encodeFile(const std::string& filename) {
-    std::ifstream in(filename, std::ios::binary);
-    if (!in) {
-        std::cerr << "Error: cannot open file " << filename << std::endl;
-        return "";
-    }
-
-    std::string encodedBits;
-    unsigned char byte;
-
-    while (in.read(reinterpret_cast<char*>(&byte), 1)) {
-        encodedBits += mCodes[byte];  // append Huffman code for each byte
-    }
-
-    // Debug: show first 64 bits
-    std::cout << "First 64 bits: "
-        << encodedBits.substr(0, 64) << std::endl;
-
-    return encodedBits;
-} 
-
-std::uintmax_t getFileSize(const std::string& filename) {
-    std::ifstream in(filename, std::ios::binary | std::ios::ate);
-    if (!in) return 0; // file not found or can't open
-    return static_cast<std::uintmax_t>(in.tellg());
+    return frequencyTable;
 }
 
 void HuffmanCompressor::compress(const std::string& inputFile, const std::string& outputFile) {
     // 1. Build frequency table
     buildFrequencyTable(inputFile);
-    auto freqTable = this->getFrequencyTable();
 
-    // 2. Build tree and codes
-    HuffNode* root = GenerateTree(freqTable);
-    GenerateCodes(root);
-
-    // 3. Open output file
-    std::ofstream out(outputFile, std::ios::binary);
-    if (!out) {
-        std::cerr << "Cannot open output file: " << outputFile << std::endl;
+    HuffmanTree tree;
+    Node* root = tree.buildTree(frequencyTable);
+    if (!root) {
+        std::cerr << "Error: File empty\n";
         return;
     }
 
-    // 4. Write header (frequency table, 256 ints)
-    for (int i = 0; i < 256; i++) {
-        int freq = freqTable[(unsigned char)i];
-        out.write(reinterpret_cast<const char*>(&freq), sizeof(int));
+    tree.generateCodes(root);
+    auto codes = tree.getCodes();
+
+    // 2. Write header (frequency table)
+    std::ofstream out(outputFile, std::ios::binary);
+    if (!out) {
+        std::cerr << "Error: Cannot open output " << outputFile << "\n";
+        return;
     }
 
-    // 5. Encode input file into bitstring
-    std::string bitString = encodeFile(inputFile);
+    for (int i = 0; i < 256; i++) {
+        uint32_t f = static_cast<uint32_t>(frequencyTable[i]);
+        out.write(reinterpret_cast<const char*>(&f), sizeof(f));
+    }
 
-    // 6. Use BitWriter for compressed data
+    // 3. Encode input
+    std::ifstream in(inputFile, std::ios::binary);
+    std::string bitString;
+    unsigned char byte;
+
+    while (in.read(reinterpret_cast<char*>(&byte), 1)) {
+        bitString += codes[byte];
+    }
+
+    // 4. Write compressed data
     BitWriter writer(out);
     writer.writeBits(bitString);
     writer.flush();
 
-    std::cout << "Compressed file written: " << outputFile << std::endl;
-
-    FreeTree(root);
+    std::cout << "Compressed -> " << outputFile << "\n";
 
     // Show compression ratio
     auto originalSize = getFileSize(inputFile);
-    auto compressedSize = getFileSize(inputFile);
+    auto compressedSize = getFileSize(outputFile);
+
 
     if (originalSize > 0) {
         double ratio = (double)compressedSize / (double)originalSize;
         std::cout << "Compression ratio: " << ratio << std::endl;
-    }else if (originalSize == 0) {
+    }
+    else if (originalSize == 0) {
         std::cerr << "Error: Input file is empty.\n";
         return;
     }
 }
 
-
-
 void HuffmanCompressor::decompress(const std::string& inputFile, const std::string& outputFile) {
     std::ifstream in(inputFile, std::ios::binary);
     if (!in) {
-        std::cerr << "Error opening compressed file: " << inputFile << std::endl;
+        std::cerr << "Error: Cannot open " << inputFile << "\n";
         return;
     }
 
-    // 1. Read frequency table
-    std::array<size_t, 256> freq = { 0 };
+    // 1. Read header
+    frequencyTable.fill(0);
     for (int i = 0; i < 256; i++) {
         uint32_t f;
         in.read(reinterpret_cast<char*>(&f), sizeof(f));
-        freq[i] = f;
+        frequencyTable[i] = f;
     }
 
-    // 2. Rebuild Huffman tree
-    HuffNode* root = GenerateTree(freq);
+    // 2. Rebuild tree
+    HuffmanTree tree;
+    Node* root = tree.buildTree(frequencyTable);
     if (!root) {
-        std::cerr << "Error: Empty tree, cannot decompress.\n";
+        std::cerr << "Error: Invalid tree\n";
         return;
     }
 
-    // 3. Decode bitstream
-    std::ofstream out(outputFile, std::ios::binary);
-    BitReader br(in);
-    HuffNode* node = root;
-
     size_t totalSymbols = 0;
-    for (auto f : freq) totalSymbols += f; // total bytes in original file
+    for (auto f : frequencyTable) totalSymbols += f;
 
-    size_t decodedCount = 0;
+    // 3. Decode
+    std::ofstream out(outputFile, std::ios::binary);
+    BitReader reader(in);
+    Node* node = root;
+
+    size_t decoded = 0;
     bool bit;
 
-    while (decodedCount < totalSymbols && br.readBit(bit)) {
+    while (decoded < totalSymbols && reader.readBit(bit)) {
         node = bit ? node->right : node->left;
 
-        if (node->left == nullptr && node->right == nullptr) {
+        if (!node->left && !node->right) {
             unsigned char symbol = node->value;
             out.write(reinterpret_cast<char*>(&symbol), 1);
-            decodedCount++;
-            node = root; // restart from root
+            decoded++;
+            node = root;
         }
     }
 
-    FreeTree(root);
-    out.close();
-    std::cout << "Decompression complete: " << outputFile << std::endl;
+    std::cout << "Decompressed -> " << outputFile << "\n";
 }
-

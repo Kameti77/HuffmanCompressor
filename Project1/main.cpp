@@ -7,8 +7,8 @@
 int main() {
     HuffmanCompressor compressor;
 
-#if 1 
-    std::string filename = "../day1.bin";
+#if 0
+    std::string filename = "../examples/day1.bin";
 
     // Day 1: build frequency table
     compressor.buildFrequencyTable(filename);
@@ -58,15 +58,21 @@ int main() {
     std::cout << "\n================\n" << std::endl;
 
     // Day 5: compress 
-    std::string input = "../day1.bin";
-    std::string output = "../compressed.huf";
+    std::string input = "../examples/day1.bin";
+    std::string output = "../examples/compressed.huf";
 
     compressor.compress(input, output);
 
     // Day 6: decompress
-    compressor.decompress("../compressed.huf", "../restored.bin");
-
+    compressor.decompress("../compressed.huf", "../examples/restored.bin");
 #endif
+
+    // Test for text file
+	std::string input = "../examples/large.txt";
+	std::string output = "../examples/large.huf";
+
+	compressor.compress(input, output);
+	compressor.decompress("../examples/large.huf", "../examples/large_restored.txt");
 
     return 0;
 }

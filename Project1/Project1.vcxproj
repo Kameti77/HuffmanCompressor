@@ -133,7 +133,6 @@
     <ClCompile Include="..\src\BitWriter.cpp" />
     <ClCompile Include="..\src\HuffmanCompressor.cpp" />
     <ClCompile Include="..\src\HuffmanTree.cpp" />
-    <ClCompile Include="..\src\Node.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>

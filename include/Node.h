@@ -1,19 +1,22 @@
 #ifndef NODE_H
 #define NODE_H
 
-#include <memory>
-
 struct Node {
-    char ch;
-    int freq;
-    std::shared_ptr<Node> left;
-    std::shared_ptr<Node> right;
+    unsigned char value;   // byte value
+    size_t freq;           // frequency
+    Node* left;
+    Node* right;
 
-    Node(char c, int f);
-    Node(std::shared_ptr<Node> l, std::shared_ptr<Node> r);
+    Node(unsigned char v, size_t f, Node* l = nullptr, Node* r = nullptr)
+        : value(v), freq(f), left(l), right(r) {
+    }
+};
 
-    // Utility: check if node is leaf
-    bool isLeaf() const;
+// Comparator for priority_queue
+struct CompareNode {
+    bool operator()(Node* a, Node* b) {
+        return a->freq > b->freq; 
+    }
 };
 
 #endif

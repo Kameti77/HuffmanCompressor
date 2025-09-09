@@ -27,9 +27,6 @@
     <ClCompile Include="..\src\HuffmanTree.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Node.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\HuffmanCompressor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

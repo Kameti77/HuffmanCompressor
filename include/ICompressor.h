@@ -7,6 +7,8 @@ class ICompressor {
 public:
     virtual ~ICompressor() = default;
 
+    // Pure virtual methods for polymorphism
+ 
     // Compress input file into output file
     virtual void compress(const std::string& inputFile, const std::string& outputFile) = 0;
 
